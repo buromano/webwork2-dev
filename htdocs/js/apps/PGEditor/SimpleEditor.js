@@ -47,7 +47,7 @@ function(Backbone, _,WebPage){
         events: {"click #build-script": "buildScript"},
         buildScript: function (){
             
-        
+            var tmp = _.template($("#pg-template").text());
         
                 
             var inputProblemDiscription = $("#ProblemDiscription-input").val();
