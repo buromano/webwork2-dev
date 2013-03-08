@@ -86,12 +86,7 @@ function knowl_click_handler($el) {
     $knowl.hide();
     // DRG: inline code
     if ($el.attr("class") == 'internal') {
-      if ($el.attr("base64") == 1 ){
-      	$output.html(Base64.decode( $el.attr("value") ));
-      } else {
-      	$output.html( $el.attr("value") );
-      }
-      //console.log("here" +Base64.decode( $el.attr("value") ));
+      $output.html($el.attr("value"));
       $knowl.hide();
       $el.addClass("active");
       if(window.MathJax == undefined) {
@@ -134,9 +129,8 @@ function knowl_click_handler($el) {
  *  download/show/hide magic. also add a unique ID, 
  *  necessary when the same reference is used several times. */
 $(function() {
-  // $("*[knowl]").live({
-    $("body").on("click", "*[knowl]", function(evt) {
-//  click: function(evt) {
+  $("*[knowl]").live({
+    click: function(evt) {
       evt.preventDefault();
       var $knowl = $(this);
       if(!$knowl.attr("knowl-uid")) {
@@ -144,6 +138,6 @@ $(function() {
         knowl_id_counter++;
       }
       knowl_click_handler($knowl, evt);
-//    }
+    }
   });
 });

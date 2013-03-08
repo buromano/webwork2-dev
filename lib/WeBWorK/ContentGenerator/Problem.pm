@@ -248,7 +248,6 @@ sub attemptResults {
 	my @tableRows = ( $header );
 	my $numCorrect = 0;
 	my $numBlanks  =0;
-	my $numEssay = 0;
 	my $tthPreambleCache;
 	foreach my $name (@answerNames) {
 		my $answerResult  = $pg->{answers}->{$name};
@@ -262,8 +261,7 @@ sub attemptResults {
 		my $answerMessage = $showMessages ? $answerResult->{ans_message} : "";
 		$answerMessage =~ s/\n/<BR>/g;
 		$numCorrect += $answerScore >= 1;
-		$numEssay += $answerResult->{type} eq 'essay';
-		$numBlanks++ unless $studentAnswer =~/\S/ || $answerScore >= 1;   
+		$numBlanks++ unless $studentAnswer =~/\S/ || $answerScore >= 1;   # unless student answer contains entry
 
 		my $resultString;
 		if ($answerScore >= 1) {
@@ -318,14 +316,14 @@ sub attemptResults {
 					 $summary .= CGI::div({class=>"ResultsWithError"},$r->maketext("The answer above is NOT [_1]correct.", $fully));
 				 }
 		} else {
-				if ($numCorrect + $numEssay == scalar @answerNames) {
-					$summary .= CGI::div({class=>"ResultsWithoutError"},$r->maketext("All of the [_1] answers above are correct.",  $numEssay ? "gradeable":""));
+				if ($numCorrect == scalar @answerNames) {
+					$summary .= CGI::div({class=>"ResultsWithoutError"},$r->maketext("All of the answers above are correct."));
 				 } 
 				 #unless ($numCorrect + $numBlanks == scalar( @answerNames)) { # this allowed you to figure out if you got one answer right.
-				 elsif ($numBlanks + $numEssay != scalar( @answerNames)) {
+				 elsif ($numBlanks != scalar( @answerNames)) {
 					$summary .= CGI::div({class=>"ResultsWithError"},$r->maketext("At least one of the answers above is NOT [_1]correct.", $fully));
 				 }
-				 if ($numBlanks > $numEssay) {
+				 if ($numBlanks) {
 					my $s = ($numBlanks>1)?'':'s';
 					$summary .= CGI::div({class=>"ResultsAlert"},$r->maketext("[quant,_1,of the questions remains,of the questions remain] unanswered.", $numBlanks));
 				 }
@@ -484,13 +482,6 @@ sub previewCorrectAnswer {
 ################################################################################
 # Template escape implementations
 ################################################################################
-
-sub content {
-  my $self = shift;
-  my $result = $self->SUPER::content(@_);
-  $self->{pg}->free if $self->{pg};   # be sure to clean up PG environment when the page is done
-  return $result;
-}
 
 sub pre_header_initialize {
 	my ($self) = @_;
@@ -683,7 +674,7 @@ sub pre_header_initialize {
 		checkAnswers       => $checkAnswers,
 		getSubmitButton    => 1,
 	);
-
+	
 	# are certain options enforced?
 	my %must = (
 		showOldAnswers     => 0,
@@ -830,7 +821,7 @@ sub head {
 	}
         # Javascript and style for knowls
         print qq{
-           <script type="text/javascript" src="$webwork_htdocs_url/js/jquery-1.7.1.min.js"></script> 
+           <script type="text/javascript" src="$webwork_htdocs_url/js/jquery.js"></script> 
            <link href="$webwork_htdocs_url/css/knowlstyle.css" rel="stylesheet" type="text/css" />
            <script type="text/javascript" src="$webwork_htdocs_url/js/knowl.js"></script>};
 
@@ -854,7 +845,7 @@ sub options {
 	my $displayMode = $self->{displayMode};
 	my %can = %{ $self->{can} };
 	
-	my  @options_to_show = "displayMode";
+	my @options_to_show = "displayMode";
 	push @options_to_show, "showOldAnswers" if $can{showOldAnswers};
 	push @options_to_show, "showHints" if $can{showHints};
 	push @options_to_show, "showSolutions" if $can{showSolutions};
@@ -1093,6 +1084,7 @@ sub output_editorLink{
 	my $editorLink = "";
 	my $editorLink2 = "";
 	my $editorLink3 = "";
+	my $editorLink4 = "";
 	# if we are here without a real homework set, carry that through
 	my $forced_field = [];
 	$forced_field = ['sourceFilePath' =>  $r->param("sourceFilePath")] if
@@ -1115,20 +1107,27 @@ sub output_editorLink{
 		my $editorURL = $self->systemLink($editorPage, params=>$forced_field);
 		$editorLink3 = CGI::span(CGI::a({href=>$editorURL,target =>'WW_Editor3'}, $r->maketext("Edit3")));
 	}
+	if ($authz->hasPermissions($user, "modify_problem_sets") and $ce->{showeditors}->{simplepgeditor}) {
+		my $editorPage = $urlpath->newFromModule("WeBWorK::ContentGenerator::Instructor::SimplePGEditor", $r, 
+			courseID => $courseName, setID => $set->set_id, problemID => $problem->problem_id);
+		my $editorURL = $self->systemLink($editorPage, params=>$forced_field);
+		$editorLink4 = CGI::span(CGI::a({href=>$editorURL,target =>'Simple_Editor'}, $r->maketext("SimpleEdit")));
+	}
+
 	##### translation errors? #####
 
 	if ($pg->{flags}->{error_flag}) {
 		if ($authz->hasPermissions($user, "view_problem_debugging_info")) {
 			print $self->errorOutput($pg->{errors}, $pg->{body_text});
 
-			print $editorLink, " ", $editorLink2, " ", $editorLink3;
+			print $editorLink, " ", $editorLink2, " ", $editorLink3, " ", $editorLink4;
 		} else {
 			print $self->errorOutput($pg->{errors}, $r->maketext("You do not have permission to view the details of this error."));
 		}
 		print "";
 	}
 	else{
-		print $editorLink, " ", $editorLink2, " ", $editorLink3;
+		print $editorLink, " ", $editorLink2, " ", $editorLink3, " ", $editorLink4;
 	}
 	return "";
 }
@@ -1142,12 +1141,7 @@ sub output_checkboxes{
 	my $r = $self->r;
 	my %can = %{ $self->{can} };
 	my %will = %{ $self->{will} };
-	my $ce = $r->ce;
-    my $showHintCheckbox      = $ce->{pg}->{options}->{show_hint_checkbox};
-    my $showSolutionCheckbox  = $ce->{pg}->{options}->{show_solution_checkbox};
-    my $useKnowlsForHints     = $ce->{pg}->{options}->{use_knowls_for_hints};
-    my $useKnowlsForSolutions = $ce->{pg}->{options}->{use_knowls_for_solutions};
-    #  warn "showHintCheckbox $showHintCheckbox  showSolutionCheckbox $showSolutionCheckbox";
+
 	if ($can{showCorrectAnswers}) {
 		print WeBWorK::CGI_labeled_input(
 			-type	 => "checkbox",
@@ -1166,10 +1160,8 @@ sub output_checkboxes{
 			}
 		),"&nbsp;";
 	}
-	#  warn "can showHints $can{showHints} can show solutions $can{showSolutions}";
-	if ($can{showHints} ) {
-	  # warn "can showHints is ", $can{showHints};
-	  if ($showHintCheckbox or not $useKnowlsForHints) { # always allow checkbox to display if knowls are not used.
+	if ($can{showHints}) {
+
 		print WeBWorK::CGI_labeled_input(
 				-type	 => "checkbox",
 				-id		 => "showHints_id",
@@ -1186,14 +1178,8 @@ sub output_checkboxes{
 					-value   => 1,
 				}
 		),"&nbsp;";
-	  } else {
-	  	print CGI::hidden({name => "showHints", id=>"showHints_id", value => 1})
-	  
-	  }
 	}
-	
-	if ($can{showSolutions} ) {
-	  if (  $showSolutionCheckbox or not $useKnowlsForSolutions ) { # always allow checkbox to display if knowls are not used.
+	if ($can{showSolutions}) {
 		print WeBWorK::CGI_labeled_input(
 			-type	 => "checkbox",
 			-id		 => "showSolutions_id",
@@ -1210,9 +1196,6 @@ sub output_checkboxes{
 				-value   => 1,
 			}
 		),"&nbsp;";
-	  } else {
-	    print CGI::hidden({id=>"showSolutions_id", name => "showSolutions", value=>1})
-	  }
 	}
 	
 	if ($can{showCorrectAnswers} or $can{showHints} or $can{showSolutions}) {
@@ -1626,11 +1609,6 @@ sub output_JS{
 	
 	# The color.js file, which uses javascript to color the input fields based on whether they are correct or incorrect.
 	print CGI::start_script({type=>"text/javascript", src=>"$site_url/js/color.js"}), CGI::end_script();
-	
-	# The Base64.js file, which handles base64 encoding and decoding.
-	print CGI::start_script({type=>"text/javascript", src=>"$site_url/js/Base64.js"}), CGI::end_script();
-	
-	
 	return "";
 }
 

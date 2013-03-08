@@ -13,3 +13,7 @@ htdocs/site_info.txt
 bin/wwapache2ctl
 webwork2.komodoproject
 #courses.dist/*
+node_modules
+node_modules/*
+WeBWorK.sublime-project
+WeBWorK.sublime-workspace

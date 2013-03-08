@@ -444,7 +444,7 @@ clear: both;
     font-size:100%;
 	float: left; /*was right*/
 	min-width: 0;
-	overflow: hidden; /*was auto*/
+	overflow: auto; /*was hidden*/
 	/*margin-right: -1px;*/
 	background-color: #fff;
 }
