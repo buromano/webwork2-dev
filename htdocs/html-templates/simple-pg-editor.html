@@ -7,7 +7,109 @@
   </ul>
  
 <div class="tab-content">
-  <div class="tab-pane active" id="editor-tab"><p>Here&apos;s where the editor goes.</p></div>
+  <div class="tab-pane active" id="editor-tab"><h2>Simple PG Generator</h2>
+    
+    <textarea id="ProblemStatement-input" rows="25" cols="50">
+        This is a the question.  
+    </textarea>
+    <button id="build-script">Build Script</button>
+    <textarea id="pg-code" rows="25" cols="50">
+        This is code  
+    </textarea>
+    <BR>
+        Type of Answer     <select id="answerType-select">
+         <option>Number</option>,
+        <option>Number With Units</option>
+        <option>String</option>
+        <option>Formula</option>
+        <option>Formula with Units</option>
+        <option>Interval</option>
+        <option>Inequality-Only</option>
+        <option>Interval or Inequality</option>
+        <option>Comma Seperated List of Values</option>
+        <option>Multiple Choice</option>
+
+    </select>
+    <BR>
+    Answer
+    <BR>
+    <textarea id="Answer-input" rows="1" cols="50">
+        Answer here.
+    </textarea>
+
+    
+    <BR>
+    Subject:
+    <select id="DBsubject-select">
+        <option>Algebra</option>,
+        <option>Calculus</option>
+        <option>Complex Analysis</option>
+        <option>Discrete Mathematics</option>
+        <option>Financial Mathematics</option>
+        <option>Inequalities</option>
+        <option>Intermediate Algebra</option>
+        <option>Introduction to Statistics</option>
+        <option>Linear Algebra</option>,
+        <option>Middle School</option>,
+        <option>NECAP</option>,
+        <option>Precalculus</option>,
+        <option>Probability</option>,
+        <option>Statistics</option>,
+        <option>Trigonometry</option>,
+        <option>WeBWorK</option>,
+    </select>
+    Chapter:
+    <select id="DBchapter-select">
+        <option>Algebra</option>,
+        <option>Calculus</option>
+        <option>Complex Analysis</option>
+        <option>Discrete Mathematics</option>
+        <option>Financial Mathematics</option>
+        <option>Inequalities</option>
+        <option>Intermediate Algebra</option>
+        <option>Introduction to Statistics</option>
+        <option>Linear Algebra</option>,
+        <option>Middle School</option>,
+        <option>NECAP</option>,
+        <option>Precalculus</option>,
+        <option>Probability</option>,
+        <option>Statistics</option>,
+        <option>Trigonometry</option>,
+        <option>WeBWorK</option>,
+    </select>
+    <BR>
+    Author
+    <BR>
+        <input id="Author-input" size="40">
+     <BR>
+   Institution <BR><input id="Institution-input" size="40">
+    <BR>
+    Text Title<BR><input id="TitleText1-input" size="40">
+     <BR>
+   Text Edition <BR><input id="EditionText1-input" size="40">
+     <BR>
+   Text Author <BR><input id="AuthorText1-input" size="40">
+    <BR>
+    Text Section <BR><input id="Section1-input" size="40">
+     <BR>
+   Text Problem <BR><input id="Problem1-input" size="40">
+    <BR>
+        
+        
+    <BR>
+        Problem Discription
+    <BR>
+    <textarea id="ProblemDiscription-input" rows="2" cols="50">
+        Problem Discription here. 
+    </textarea>
+
+    <BR>
+        Problem Solution (Optional)
+    <BR>
+    <textarea id="ProblemSolution-input" rows="2" cols="50">
+        Problem Solution here. 
+    </textarea>
+    </div>
   <div class="tab-pane" id="viewer-tab"><p>Here&apos;s where the problem will appear.</div>
 </div> 
 
@@ -19,3 +121,82 @@
 </p>
     
 </script>
+
+
+
+<script type="text/template" id="pg-template">
+##DESCRIPTION
+##KEYWORDS('trigonometry', 'limits')
+##  <%=ProblemDiscription%>
+##ENDDESCRIPTION
+
+## Created with simple-pg
+
+## DBsubject('<%=DBsubject%>')
+## DBchapter('<%=DBchapter%>')
+## DBsection('Derivatives of Trigonometric Functions')
+## Date('')
+## Author('<%=Author%>')
+## Institution('<%=Institution%>')
+## TitleText1('<%=TitleText1%>')
+## EditionText1('<%=EditionText1%>')
+## AuthorText1('<%=AuthorText1%>')
+## Section1('<%=Section1%>')
+## Problem1('<%=Problem1%>')
+
+DOCUMENT();        # This should be the first executable line in the problem.
+
+loadMacros(
+   "PGstandard.pl",     # Standard macros for PG language
+   "contextInequalities.pl", #automatically loads MathObjects.pl
+ #  "MathObjects.pl",
+   "PGchoicemacros.pl",
+   "parserNumberWithUnits.pl",
+   "parserFormulaWithUnits.pl",
+   "AnswerFormatHelp.pl",        # provides help links to students
+);
+
+
+TEXT(beginproblem());
+$showPartialCorrectAnswers = 1;
+
+##############################################################
+#
+#  Setup
+#
+#
+
+<%=SetupSection%>
+
+
+##############################################################
+#
+#  Text 
+#
+#
+
+
+<%=TextSection%>
+##############################################################
+#
+# Answers
+#
+#
+
+
+<%=AnswerSection%>
+
+Context()->texStrings;
+SOLUTION(EV3(<<'END_SOLUTION'));
+$PAR SOLUTION $PAR
+<%=ProblemSolution%>
+
+END_SOLUTION
+Context()->normalStrings;
+
+
+COMMENT('MathObject version');
+ENDDOCUMENT();
+#############################################################
+
+    </script>
