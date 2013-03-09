@@ -94,8 +94,8 @@ function(Backbone, _,WebPage){
                         _answerSection = "ANS($answer->cmp);";
                 } else if (answer_type == "String") {
 			_setupSection = "Context(\"Numeric\");\nContext()->strings->add(\""+inputAnswer+"\"=>{});\n \n$answer = Compute(\" ".concat(inputAnswer).concat("\");");
-                        _textSection = "";
-                        _answerSection = "";
+                        _textSection = "Context()->texStrings;\nBEGIN_TEXT \n ".concat(inputProblemStatement).concat("$BR $BR\nAnswer:\\{ans_rule(55)\\} \\{AnswerFormatHelp(\"numbers\")\\}\n\nEND_TEXT\nContext()->normalStrings;");
+                        _answerSection = "ANS($answer->cmp);";
                 } else if (answer_type == "Formula") {
 			_setupSection = "Context(\"Numeric\");\nContext()->variables->are("+VariableListString+"=>\"Real\");"+" \n$answer = Compute(\" ".concat(inputAnswer).concat("\");");
                         _textSection = "Context()->texStrings;\nBEGIN_TEXT \n ".concat(inputProblemStatement).concat("$BR $BR\nAnswer:\\{ans_rule(55)\\} \\{AnswerFormatHelp(\"formulas\")\\}\n\nEND_TEXT\nContext()->normalStrings;");
