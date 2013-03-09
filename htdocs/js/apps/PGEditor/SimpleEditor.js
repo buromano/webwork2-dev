@@ -93,7 +93,7 @@ function(Backbone, _,WebPage){
                         _textSection = "Context()->texStrings;\nBEGIN_TEXT \n ".concat(inputProblemStatement).concat("$BR $BR\nAnswer:\\{ans_rule(55)\\} \\{AnswerFormatHelp(\"numbers\")\\}\n\nEND_TEXT\nContext()->normalStrings;");
                         _answerSection = "ANS($answer->cmp);";
                 } else if (answer_type == "String") {
-			_setupSection = "";
+			_setupSection = "Context(\"Numeric\");\nContext()->strings->add(\""+inputAnswer+"\"=>{});\n \n$answer = Compute(\" ".concat(inputAnswer).concat("\");");
                         _textSection = "";
                         _answerSection = "";
                 } else if (answer_type == "Formula") {
