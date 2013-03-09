@@ -143,7 +143,8 @@ function(Backbone, _,WebPage){
                                   ProblemSolution:inputProblemSolution
                                   }));
             
-            });
+          
+        }
     });
 
     new HomeworkEditorView({el: $("div#mainDiv")});
