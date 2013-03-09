@@ -61,6 +61,19 @@ function(Backbone, _,WebPage){
             var inputSection1 = $("#Section1-input").val();
             var inputProblem1 = $("#Problem1-input").val();
             var inputAnswer = $("#Answer-input").val();
+            var inputExtraMultipleChoice = $("#ExtraMultipleChoice-input").val();
+            var ExtraChoiceArray = inputExtraMultipleChoice.split(",");
+           
+            ExtraChoiceString = ExtraChoiceArray.join('","');         
+            var inputLastChoice = $("#LastChoice-input").val();
+            var LastChoiceString = "";
+            if ($("#LastChoiceCheckBox").prop("checked")){
+                LastChoiceString = "$mc->makeLast(\""+inputLastChoice+"\");"
+                };
+            var inputVariableList = $("#VariableList-input").val();
+            var VariableListArray = inputVariableList.split(",");
+            var VariableListString = "Context()->variables->are(";
+            VariableListString = VariableListArray.join('=>\"Real\",\n');
             var inputProblemSolution = $("#ProblemSolution-input").val();
             
             console.log(inputAuthor);
@@ -82,11 +95,11 @@ function(Backbone, _,WebPage){
                         _textSection = "";
                         _answerSection = "";
                 } else if (answer_type == "Formula") {
-			_setupSection = "Context(\"Numeric\");\n \n$answer = Compute(\" ".concat(inputAnswer).concat("\");");
+			_setupSection = "Context(\"Numeric\");\nContext()->variables->are("+VariableListString+"=>\"Real\");"+" \n$answer = Compute(\" ".concat(inputAnswer).concat("\");");
                         _textSection = "Context()->texStrings;\nBEGIN_TEXT \n ".concat(inputProblemStatement).concat("$BR $BR\nAnswer:\\{ans_rule(55)\\} \\{AnswerFormatHelp(\"formulas\")\\}\n\nEND_TEXT\nContext()->normalStrings;");
                         _answerSection = "ANS($answer->cmp);";
                 } else if (answer_type == "Formula with Units") {
-			_setupSection = "Context(\"Numeric\");\n \n$answer = FormulaWithUnits(\" ".concat(inputAnswer).concat("\");");
+			_setupSection = "Context(\"Numeric\");\nContext()->variables->are("+VariableListString+"=>\"Real\");"+" \n$answer = FormulaWithUnits(\" ".concat(inputAnswer).concat("\");");
                         _textSection = "Context()->texStrings;\nBEGIN_TEXT \n ".concat(inputProblemStatement).concat("$BR $BR\nAnswer:\\{ans_rule(55)\\} \\{AnswerFormatHelp(\"formulas\")\\}\n\nEND_TEXT\nContext()->normalStrings;");
                         _answerSection = "ANS($answer->cmp);";
                 } else if (answer_type == "Interval") {
@@ -106,7 +119,7 @@ function(Backbone, _,WebPage){
                         _textSection = "Context()->texStrings;\nBEGIN_TEXT \n ".concat(inputProblemStatement).concat("$BR $BR\nAnswer:\\{ans_rule(55)\\} \\{AnswerFormatHelp(\"numbers\")\\}\n$BR\nEnter answers as a comma separated list.\nEND_TEXT\nContext()->normalStrings;");
                         _answerSection = "ANS($answer->cmp);";
                 } else if (answer_type == "Multiple Choice") {
-			_setupSection = "$mc = new_multiple_choice();\n$mc->qa(\"".concat(inputProblemStatement).concat("\",\"").concat(inputAnswer).concat("\");\n$mc->extra(\"choice2\", \"choice3\");\n$mc->makeLast(\"none of these\");");
+			_setupSection = "$mc = new_multiple_choice();\n$mc->qa(\"".concat(inputProblemStatement).concat("\",\"").concat(inputAnswer).concat("\");\n$mc->extra(\"").concat(ExtraChoiceString).concat("\");\n").concat(LastChoiceString);
                         _textSection = "Context()->texStrings;\nBEGIN_TEXT \n\\{$mc->print_q()\\}\n$BR\n\\{$mc->print_a()\\}\nEND_TEXT\nContext()->normalStrings;";
                         _answerSection = "ANS(radio_cmp($mc->correct_ans()));";
                 }
@@ -125,15 +138,10 @@ function(Backbone, _,WebPage){
                                   SetupSection:_setupSection,
                                   TextSection:_textSection,
                                   AnswerSection:_answerSection,
-                                  answer:inputAnswer,
                                   ProblemSolution:inputProblemSolution
                                   }));
             
-        }
-        
-
-
-    });
+            });
 
     new HomeworkEditorView({el: $("div#mainDiv")});
 });
