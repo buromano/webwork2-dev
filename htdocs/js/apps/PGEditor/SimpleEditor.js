@@ -42,7 +42,9 @@ function(Backbone, _,WebPage){
             this.render();
         },
         render: function (){
-          #  this.libraryTreeView = new LibraryTreeVuew({parent})
+          /*  this.libraryTreeView = new LibraryTreeVuew({parent})
+           */
+          
             
         },
         events: {"click #build-script": "buildScript"},
