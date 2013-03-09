@@ -144,6 +144,7 @@ function(Backbone, _,WebPage){
                                   }));
             
             });
+    });
 
     new HomeworkEditorView({el: $("div#mainDiv")});
 });
