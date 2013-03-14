@@ -1,3 +1,10 @@
+<html>
+  <head>
+    <script data-main="../js/apps/PGEditor/SimpleEditor.js" src ="../js/lib/vendor/requirejs/require.js"></script>
+  </head>
+  <body>
+    
+ 
 <div id="mainDiv">
 <h3>Simple PG Editor and Problem Viewer</h3>
 
@@ -8,52 +15,49 @@
  
 <div class="tab-content">
   <div class="tab-pane active" id="editor-tab"><h2>Simple PG Generator</h2>
-    
-    <textarea id="ProblemStatement-input" rows="25" cols="50">
+        <textarea id="ProblemStatement-input" rows="25" cols="50">
         This is a the question.  
     </textarea>
     <button id="build-script">Build Script</button>
+
     <textarea id="pg-code" rows="25" cols="50">
         This is code  
     </textarea>
+
     <BR>
       <select id="answerType-select">
-        <option>Choose Type of Answer</option>,
-        <option>Number</option>,
-        <option>Number With Units</option>
-        <option>String</option>
-        <option>Formula</option>
-        <option>Formula with Units</option>
-        <option>Interval</option>
-        <option>Inequality-Only</option>
-        <option>Interval or Inequality</option>
-        <option>Comma Seperated List of Values</option>
-        <option>Multiple Choice</option>
+        <option value = "EmptyTemplate">Choose Type of Answer</option>,
+        <option value = "NumberOptionTemplate">Number</option>,
+        <option value = "StringOptionTemplate">String</option>
+        <option value = "FormulaOptionTemplate">Formula</option>
+        <option value = "IntervalOrInequalityOptionTemplate">Interval or Inequality</option>
+        <option value = "ComaSeperatedValuesOptionTemplate">Comma Seperated List of Values</option>
+        <option value = "MultipleChoiceOptionTemplate">Multiple Choice</option>
 
       </select>
-    <BR>
-    Answer
-    <BR>
-    <input id="Answer-input" size="50" value="Answer here.">
+     <div id=answerArea>
+      <BR>
+      <BR>
+      <BR>
+      <BR>
+      <BR>
 
-    <BR>
-    extra multiple choice:  enter in comma separated list.
-    <BR>
-    <input id="ExtraMultipleChoice-input" size="100" value= "choice1, choice2">
-
-
-    <BR>
-    last choice in multiple choice:  will always be last - optional.
-    <BR>
-    <input id="LastChoice-input" size="40" value = "None of the above.">
-
-    <input id="LastChoiceCheckBox" type="checkbox"> Use last choice option.
+     </div>
+ <hr>
         
     <BR>
-    variables in formula:  enter in comma separated list.
+        Problem Description
     <BR>
-    <input id="VariableList-input" size ="50" value="s, t">
+    <textarea id="ProblemDescription-input" rows="2" cols="50">
+        Problem Description here. 
+    </textarea>
 
+    <BR>
+        Problem Solution (Optional)
+    <BR>
+    <textarea id="ProblemSolution-input" rows="2" cols="50">
+        Problem Solution here. 
+    </textarea>
 
     
     <BR> <BR>
@@ -96,38 +100,48 @@
         <option>Trigonometry</option>,
         <option>WeBWorK</option>,
     </select>
-    <BR>
-    Author
-    <BR>
-        <input id="Author-input" size="40">
-     <BR>
-   Institution <BR><input id="Institution-input" size="40">
-    <BR>
-    Text Title<BR><input id="TitleText1-input" size="40">
-     <BR>
-   Text Edition <BR><input id="EditionText1-input" size="40">
-     <BR>
-   Text Author <BR><input id="AuthorText1-input" size="40">
-    <BR>
-    Text Section <BR><input id="Section1-input" size="40">
-     <BR>
-   Text Problem <BR><input id="Problem1-input" size="40">
-    <BR>
+    <BR><BR>
+    Author Information:<BR>
+    <table>
+      <tr>
+        <td>Problem Author</td>
+        <td>Institution </td>
+      </tr>
+      <tr>
+        <td><input id="Author-input" size="40"></td>
+        <td><input id="Institution-input" size="40"></td>
+      </tr>
+    </table>
         
-        
+   
     <BR>
-        Problem Discription
-    <BR>
-    <textarea id="ProblemDiscription-input" rows="2" cols="50">
-        Problem Discription here. 
-    </textarea>
+      
+      Text Specific Information: <BR>
+    <table>
+      <tr>
+        <td>Text Title</td>
+        <td>Text Edition</td>
+      </tr>
+      <tr>
+        <td><input id="TitleText1-input" size="40"></td>
+        <td><input id="EditionText1-input" size="40"></td>
+      </tr>
+      <tr>
+        <td>Text Author</td>
+      </tr>
+      <tr>
+        <td><input id="AuthorText1-input" size="40"></td>
+      </tr>
+      <tr>
+        <td>Text Section</td>
+        <td>Text Problem</td>
+      </tr>
+      <tr>
+        <td><input id="Section1-input" size="40"></td>
+        <td><input id="Problem1-input" size="40"></td>
+      </tr>
+    </table> 
 
-    <BR>
-        Problem Solution (Optional)
-    <BR>
-    <textarea id="ProblemSolution-input" rows="2" cols="50">
-        Problem Solution here. 
-    </textarea>
     </div>
   <div class="tab-pane" id="viewer-tab"><p>Here&apos;s where the problem will appear.</div>
 </div> 
@@ -146,7 +160,7 @@
 <script type="text/template" id="pg-template">
 ##DESCRIPTION
 ##KEYWORDS('trigonometry', 'limits')
-##  <%=ProblemDiscription%>
+##  <%=ProblemDescription%>
 ##ENDDESCRIPTION
 
 ## Created with simple-pg
@@ -219,3 +233,82 @@ ENDDOCUMENT();
 #############################################################
 
     </script>
+<script id="EmptyTemplate" type="text/template">
+    <BR>
+    <BR>
+    <BR>
+    <BR>
+    <BR>
+</script>
+
+<script id="NumberOptionTemplate" type="text/template">
+    <BR>
+    Answer
+    <BR>
+    <input id="Answer-input" size="50" value="Answer here.">
+    <input id="requireUnitsCheckBox" type="checkbox"> Require units in answer.
+    <BR><BR><BR>
+</script>
+
+<script id="StringOptionTemplate" type="text/template">
+      <BR>
+    Answer
+    <BR>
+    <input id="Answer-input" size="50" value="Answer here.">
+    <BR><BR><BR><BR>
+</script>
+<script id="FormulaOptionTemplate" type="text/template">
+      <BR>
+    Answer
+    <BR>
+    <input id="Answer-input" size="50" value="Answer here.">
+    <input id="requireUnitsCheckBox" type="checkbox">  Require units in answer.
+	<BR>
+ Variables in formula  
+    <BR>
+    <input id="VariableList-input" size ="50" value="s, t"> Enter in comma separated list.
+    <BR><BR>
+</script>
+
+<script id="IntervalOrInequalityOptionTemplate" type="text/template">
+      <BR>
+    Answer
+    <BR>
+    <input id="Answer-input" size="50" value="Answer here.">
+    <BR>
+    <input id="allowIntervalCheckBox" type="checkbox"> Allow interval notation in answer.
+    <BR>
+    <input id="allowInequalityCheckBox" type="checkbox"> Allow inequality notation in answer.
+    <BR><BR>
+</script>
+
+<script id="CommaSeparatedValuesOptionTemplate" type="text/template">
+      <BR>
+    Answer
+    <BR>
+    <input id="Answer-input" size="50" value="Answer here.">
+    <BR><BR><BR><BR>
+</script>
+
+<script id="MultipleChoiceOptionTemplate" type="text/template">
+      <BR>
+    Answer
+    <BR>
+    <input id="Answer-input" size="50" value="Answer here.">
+    
+    <BR>
+    extra multiple choice:  enter in comma separated list.
+    <BR>
+    <input id="ExtraMultipleChoice-input" size="100" value= "choice1, choice2">
+
+
+    <BR>
+    last choice in multiple choice:  will always be last - optional.
+    <BR>
+    <input id="LastChoice-input" size="40" value = "None of the above.">
+
+    <input id="LastChoiceCheckBox" type="checkbox"> Use last choice option.
+
+</script>
+ </body>
+</html>
